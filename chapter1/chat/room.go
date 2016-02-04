@@ -41,8 +41,11 @@ func (r *room) run() {
 			r.tracer.Trace("新しいクライアントが参加しました")
 		case client := <-r.leave:
 			// 退室
+			_, exists := r.clients[client]
 			delete(r.clients, client)
-			close(client.send)
+			if exists {
+				close(client.send)
+			}
 			r.tracer.Trace("クライアントが退室しました")
 		case msg := <-r.forward:
 			r.tracer.Trace("メッセージを受信しました: ", string(msg))
